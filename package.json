@@ -11,11 +11,56 @@
   ],
   "activationEvents": [
     "onCommand:autoflow.sayhi",
-    "onCommand:autoflow.flow"
+    "onCommand:autoflow.flow",
+    "onView:nodeDependencies",
+    "*"
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsWelcome": [
+      {
+        "view": "nodeDependencies",
+        "contents": " [Add Dependency](command:nodeDependencies.addEntry)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "package-explorer",
+          "title": "Package Explorer",
+          "icon": "./media/developer.png"
+        }
+      ]
+    },
+    "views": {
+      "package-explorer": [
+        {
+          "id": "nodeDependencies",
+          "name": "Trello",
+          "icon": "./media/developer.png",
+          "contextualTitle": "Package Explorer"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+          {
+              "command": "nodeDependencies.refreshEntry",
+              "when": "view == nodeDependencies",
+              "group": "navigation"
+          },
+          {
+            "command": "nodeDependencies.addEntry",
+            "when": "view == nodeDependencies"
+          }
+      ]
+  },
+  
     "commands": [
+      {
+        "command": "nodeDependencies.addEntry",
+        "title": "Add"
+      },
       {
         "command": "autoflow.sayhi",
         "title": "Say Hi"
@@ -23,6 +68,14 @@
       {
         "command": "autoflow.flow",
         "title": "Flow"
+      },
+      {
+        "command": "nodeDependencies.refreshEntry",
+        "title": "Refresh",
+        "icon": {
+            "light": "resources/light/refresh.svg",
+            "dark": "resources/dark/refresh.svg"
+        }
       }
     ],
     "keybindings": [
