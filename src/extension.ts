@@ -13,13 +13,31 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('autoflow.helloWorld', () => {
+	let disposable = vscode.commands.registerCommand('autoflow.sayhi', () => {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from autoflow!');
+		vscode.window.showInformationMessage('Hello VS Code from autoflow!');
 	});
 
+	let disposableFlow = vscode.commands.registerCommand('autoflow.flow', async () => {
+		// The code you place here will be executed every time your command is executed
+		// Display a message box to the user
+		const openedDoc = vscode.window.activeTextEditor;
+		const queryText = openedDoc?.document.getText(openedDoc.selection);
+		if (!queryText){
+			vscode.window.showErrorMessage('No Code Selected... Highlight some code please');
+			return;
+		}
+		openedDoc?.edit((editText)=>{
+			editText.replace(openedDoc.selection, `//this is documentation from openai \n${queryText}`);
+		});
+		vscode.window.showInformationMessage('Operation Succussfull')
+
+	});
+
+
 	context.subscriptions.push(disposable);
+	context.subscriptions.push(disposableFlow);
 }
 
 // this method is called when your extension is deactivated

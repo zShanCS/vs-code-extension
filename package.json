@@ -10,14 +10,19 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:autoflow.helloWorld"
+        "onCommand:autoflow.sayhi",
+		"onCommand:autoflow.flow"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "autoflow.helloWorld",
-				"title": "Hello World"
+				"command": "autoflow.sayhi",
+				"title": "Say Hi"
+			},
+			{
+				"command": "autoflow.flow",
+				"title": "Flow"
 			}
 		]
 	},
