@@ -89,12 +89,18 @@ export function activate(context: vscode.ExtensionContext) {
 				});
 				vscode.window.showInformationMessage('Succussfull');
 			} 
-			catch (error) {
+			catch (error:any) {
 				console.log(error);
+				if (error?.response?.status>=500){
+					vscode.window.showErrorMessage('looks like Server failed...');
+				}
+				else if (error?.response?.status>=400){
+					vscode.window.showErrorMessage('looks like Authorrization failed...');
+				}
+				else{
 				vscode.window.showErrorMessage('looks like something went wrong...');
+				}
 			}
-
-			
 		});
 
 	});
