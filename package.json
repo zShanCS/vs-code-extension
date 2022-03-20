@@ -19,8 +19,8 @@
   "contributes": {
     "viewsWelcome": [
       {
-        "view": "nodeDependencies",
-        "contents": " [Add Dependency](command:nodeDependencies.addEntry)"
+        "view": "Trello",
+        "contents": " [Authenticate](command:Trello.authenticate)"
       }
     ],
     "viewsContainers": {
@@ -35,7 +35,7 @@
     "views": {
       "package-explorer": [
         {
-          "id": "nodeDependencies",
+          "id": "Trello",
           "name": "Trello",
           "icon": "./media/developer.png",
           "contextualTitle": "Package Explorer"
@@ -44,22 +44,21 @@
     },
     "menus": {
       "view/title": [
-          {
-              "command": "nodeDependencies.refreshEntry",
-              "when": "view == nodeDependencies",
-              "group": "navigation"
-          },
-          {
-            "command": "nodeDependencies.addEntry",
-            "when": "view == nodeDependencies"
-          }
+        {
+          "command": "Trello.refreshEntry",
+          "when": "view == Trello",
+          "group": "navigation"
+        },
+        {
+          "command": "Trello.authenticate",
+          "when": "view == Trello"
+        }
       ]
-  },
-  
+    },
     "commands": [
       {
-        "command": "nodeDependencies.addEntry",
-        "title": "Add"
+        "command": "Trello.authenticate",
+        "title": "Authenticate"
       },
       {
         "command": "autoflow.sayhi",
@@ -70,11 +69,11 @@
         "title": "Flow"
       },
       {
-        "command": "nodeDependencies.refreshEntry",
+        "command": "Trello.refreshEntry",
         "title": "Refresh",
         "icon": {
-            "light": "resources/light/refresh.svg",
-            "dark": "resources/dark/refresh.svg"
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
         }
       }
     ],
@@ -109,6 +108,7 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
+    "axios": "^0.26.1",
     "dotenv": "^16.0.0",
     "openai": "^2.0.5"
   }
