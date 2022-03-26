@@ -66,15 +66,31 @@
       },
       {
         "command": "autoflow.flow",
-        "title": "Flow"
+        "title": "Autoflow: Flow"
       },
       {
         "command": "autoflow.code2nl",
-        "title": "Code To Natural Language"
+        "title": "Autoflow: Code To Natural Language"
       },
       {
         "command": "autoflow.fix_bugs",
-        "title": "Fix Bugs In Code"
+        "title": "Autoflow: Fix Bugs In Code"
+      },
+      {
+        "command": "autoflow.explain_error",
+        "title": "Autoflow: Explain Error"
+      },
+      {
+        "command": "autoflow.sql2nl",
+        "title": "Autoflow: Explain SQL Query"
+      },
+      {
+        "command": "autoflow.oneliner",
+        "title": "Autoflow: Make One Liner"
+      },
+      {
+        "command": "autoflow.docstring",
+        "title": "Autoflow: Make Doc STring"
       },
       {
         "command": "nodeDependencies.refreshEntry",

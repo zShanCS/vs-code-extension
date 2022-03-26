@@ -126,6 +126,47 @@ function generateLens(command:string, range:vscode.Range){
                     });
                 }
             break;
+            case 'get_error_explanation':
+                {
+                    return new vscode.CodeLens(range, {
+                        title:'Explain Error',
+                        command:'autoflow.explain_error',
+                        tooltip:'Find and Explain Error in selected code',
+                        arguments:[range]
+                    });
+                }
+            break;
+            case 'sql2nl':
+                {
+                    return new vscode.CodeLens(range, {
+                        title:'Explain SQL Query',
+                        command:'autoflow.sql2nl',
+                        tooltip:'Explain SQL Query in Natural Language',
+                        arguments:[range]
+                    });
+                }
+            break;
+            case 'get_oneliner':
+                {
+                    return new vscode.CodeLens(range, {
+                        title:'Generate One Line Code',
+                        command:'autoflow.oneliner',
+                        tooltip:'Generate One Line Alternative',
+                        arguments:[range]
+                    });
+                }
+            break;
+            case 'code2docstring':
+                {
+                    return new vscode.CodeLens(range, {
+                        title:'Make DocString',
+                        command:'autoflow.docstring',
+                        tooltip:'Generate Documentation',
+                        arguments:[range]
+                    });
+                }
+            break;
+            
     
         default:
             break;
