@@ -399,7 +399,8 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(`One Liner ran with`, args);
 		const openedDoc = vscode.window.activeTextEditor;
 		//when the selection starts. this helps to see where to put the result
-		const selectionStart = openedDoc?.selection.anchor;
+		const selectionStart = openedDoc?.selection.start;
+		const selectionEnd = openedDoc?.selection.end;
 		const prompt = openedDoc?.document.getText(openedDoc.selection);
 
 		if (!prompt){
@@ -445,10 +446,10 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 				openedDoc?.edit((editText)=>{
 					if (fileExtension === 'py'){
-						editText.insert(range?.end ?? selectionStart, `\n'''\nOne Liner:\n${res['data']['output']}\n'''\n`);
+						editText.insert(selectionEnd?? range?.end, `\n'''\nOne Liner:\n${res['data']['output']}\n'''\n`);
 					}
 					else{
-						editText.insert(range?.end ?? selectionStart, `\n/*\nOne Liner:\n${res['data']['output']}\n*/\n`);
+						editText.insert(selectionEnd?? range?.end, `\n/*\nOne Liner:\n${res['data']['output']}\n*/\n`);
 					}
 					
 				});
@@ -528,13 +529,177 @@ export function activate(context: vscode.ExtensionContext) {
 		
 
 	});
+
+	let disposableCode2UT = vscode.commands.registerCommand('autoflow.unit_test',async (...args:any[]) => {
+		console.log(`Unit Test ran with`, args);
+		const openedDoc = vscode.window.activeTextEditor;
+		//when the selection starts. this helps to see where to put the result
+		const selectionStart = openedDoc?.selection.anchor;
+		const prompt = openedDoc?.document.getText(openedDoc.selection);
+
+		if (!prompt){
+			vscode.window.showErrorMessage('No Code Selected. Please Highlight Some Code..');
+			return;
+		}
+		const fileExtension = openedDoc?.document.fileName.split('.').pop();
+		console.log('opened file is',fileExtension);
+		const range:vscode.Range = args[0];
+
+		vscode.window.withProgress({
+			location:vscode.ProgressLocation.Notification,
+			cancellable:true,
+			title:'AutoFlow'
+		}, async (progress, cancelToken)=>{
+			cancelToken.onCancellationRequested(()=>{
+				vscode.window.showInformationMessage('Cancelled!');
+			});
+
+			progress.report({increment:0, message:'Processing your query...'});
+			setTimeout(() => {
+				progress.report({increment:30, message:'Generating response'});
+			}, 1000);
+			setTimeout(() => {
+				progress.report({increment:20, message:'Half way there...'});
+			}, 3000);
+			setTimeout(() => {
+				progress.report({increment:30, message:'Finishing query'});
+			}, 5000);
+			setTimeout(() => {
+				progress.report({increment:15, message:'Prinitng Response'});
+			}, 9000);
+
+			try {
+				const res = await axios.post(`http://127.0.0.1:8080/code2ut`, {
+								prompt: prompt,
+								language: fileExtension
+							});
+				console.log(res, res['data']);
+				if (res['data']['status']!=='ok'){
+					vscode.window.showErrorMessage('looks like something went wrong...');
+					return;
+				}
+				openedDoc?.edit((editText)=>{
+					if (fileExtension === 'py'){
+						editText.insert(range?.end ?? selectionStart, `\n'''Unit Tests:\n\n${res['data']['output']}\n'''\n`);
+					}
+					else{
+						editText.insert(range?.end ?? selectionStart, `\n/*Unit Tests:\n\n${res['data']['output']}\n*/\n`);
+					}
+					
+				});
+			} catch (error) {
+				console.log(error);
+				vscode.window.showErrorMessage('looks like something went wrong...');
+				return;
+			}
+		});
+		
+
+	});
+
+	let disposableCodeCompletion = vscode.commands.registerCommand('autoflow.complete_code',async (...args:any[]) => {
+		console.log(`Complete Code ran with`, args);
+		const openedDoc = vscode.window.activeTextEditor;
+		//when the selection starts. this helps to see where to put the result
+		const selectionStart = openedDoc?.selection.anchor;
+		const selectionEnd = openedDoc?.selection.end;
+		const prompt = openedDoc?.document.getText(openedDoc.selection);
+
+		if (!prompt){
+			vscode.window.showErrorMessage('No Code Selected. Please Highlight Some Code..');
+			return;
+		}
+		const fileExtension = openedDoc?.document.fileName.split('.').pop();
+		console.log('opened file is',fileExtension);
+		const range:vscode.Range = args[0];
+
+		const task = await vscode.window.showInputBox({
+			value: '',
+			valueSelection: [2, 4],
+			placeHolder: 'Enter What you want this code to do. e.g. "Check for prime numbers"',
+			validateInput: text => {
+				return text.trim() === '' ? 'Cant Be Empty' : null;
+			}
+		});
+		if (!task || task===''){
+			console.log('user enetered nothing in task, so cant really do anyhting with it.');
+			return ;
+		}
+
+		vscode.window.withProgress({
+			location:vscode.ProgressLocation.Notification,
+			cancellable:true,
+			title:'AutoFlow'
+		}, async (progress, cancelToken)=>{
+			cancelToken.onCancellationRequested(()=>{
+				vscode.window.showInformationMessage('Cancelled!');
+			});
+
+
+			try {
+				
+			
+			progress.report({increment:0, message:'Processing your query...'});
+			setTimeout(() => {
+				progress.report({increment:30, message:'Generating response'});
+			}, 1000);
+			setTimeout(() => {
+				progress.report({increment:20, message:'Half way there...'});
+			}, 3000);
+			setTimeout(() => {
+				progress.report({increment:30, message:'Finishing query'});
+			}, 5000);
+			setTimeout(() => {
+				progress.report({increment:15, message:'Prinitng Response'});
+			}, 9000);
+
+				const res = await axios.post(`http://127.0.0.1:8080/complete_code`, {
+								code: prompt,
+								task: task
+							});
+				console.log(res, res['data']);
+				if (res['data']['status']!=='ok'){
+					vscode.window.showErrorMessage('looks like something went wrong...');
+					return;
+				}
+				openedDoc?.edit((editText)=>{
+					if (fileExtension === 'py'){
+						if (selectionEnd){
+							editText.insert(selectionEnd, `${res['data']['output']}\n`);
+						}
+						else{
+						editText.insert(range?.end, `\n'''\nCompleted Code:\n\n${res['data']['output']}\n'''\n`);
+						}
+					}
+					else{
+						if (selectionEnd){
+							editText.insert(selectionEnd, `${res['data']['output']}\n`);
+						}
+						else{
+						editText.insert(range?.end, `\n/*\nCompleted Code:\n\n${res['data']['output']}\n*/\n`);
+						}
+					}
+					
+				});
+			} catch (error) {
+				console.log(error);
+				vscode.window.showErrorMessage('looks like something went wrong...');
+				return;
+			}
+		});
+		
+
+	});
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(disposableFlow);
 	context.subscriptions.push(disposableCode2nl);
 	context.subscriptions.push(disposableFixBugs);
 	context.subscriptions.push(disposableExplainError);
 	context.subscriptions.push(disposableSQL2NL);
+	context.subscriptions.push(disposableOneLiner);
 	context.subscriptions.push(disposableCode2DocString);
+	context.subscriptions.push(disposableCode2UT);
+	context.subscriptions.push(disposableCodeCompletion);
 }
 
 // this method is called when your extension is deactivated

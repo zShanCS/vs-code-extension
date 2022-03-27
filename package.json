@@ -93,6 +93,14 @@
         "title": "Autoflow: Make Doc STring"
       },
       {
+        "command": "autoflow.unit_test",
+        "title": "Autoflow: Make Unit Test"
+      },
+      {
+        "command": "autoflow.complete_code",
+        "title": "Autoflow: Code COmpletion"
+      },
+      {
         "command": "nodeDependencies.refreshEntry",
         "title": "Refresh",
         "icon": {
