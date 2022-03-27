@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 
@@ -13,6 +14,8 @@ const openai = new OpenAIApi(configuration);
 import { NodeDependenciesProvider } from './TreeView/nodeDependencies';
 import * as vscode from 'vscode';
 import { CodelensProvider } from "./CodeLensProvider";
+import { QueryGenerator } from "./QueryGenerator";
+import { addListener } from "process";
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -53,13 +56,18 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	let disposableFlow = vscode.commands.registerCommand('autoflow.flow', async (...args:any[]) => {
+
+
 		console.log('autoflow.flow command exxecuted with args: ',{args});
 		const openedDoc = vscode.window.activeTextEditor;
-			const queryText = openedDoc?.document.getText(openedDoc.selection) || args[0];
-			if (!queryText){
-				vscode.window.showErrorMessage('No Code Selected... Highlight some code please');
-				return;
-			}
+		//when the selection starts. this helps to see where to put the result
+		const selectionEnd = openedDoc?.selection.end;
+		const prompt = openedDoc?.document.getText(openedDoc.selection);
+
+		if (!prompt){
+			vscode.window.showErrorMessage('No Code Selected. Please Highlight Some Code..');
+			return;
+		}
 		vscode.window.withProgress({
 			location:vscode.ProgressLocation.Notification,
 			cancellable:true,
@@ -83,45 +91,25 @@ export function activate(context: vscode.ExtensionContext) {
 			setTimeout(() => {
 				progress.report({increment:15, message:'Prinitng Response'});
 			}, 9000);
-
-
-				
 			
 			try {
-				const res = await openai.createCompletion('code-davinci-001',{
-					temperature:0.2,
-					prompt:queryText,
-					max_tokens:256
-				});
-				console.log(res);
-				if (!res?.data?.choices){
-					console.log('api retuened undefined choices');
+				const res = await axios.post(`http://127.0.0.1:8080/magic`, {
+								prompt: prompt
+							});
+				console.log(res, res['data']);
+				if (res['data']['status']!=='ok'){
+					vscode.window.showErrorMessage('looks like something went wrong...');
 					return;
 				}
-
-				const output = res.data.choices[0].text;
-				openedDoc?.edit(async (editText)=>{
-					if (args[1]){
-						editText.insert(args[1].end,`\n#Autoflow Query: ${queryText}.\n#Response:\n${output}`);
-					}
-					else {
-						editText.replace(openedDoc.selection,`${queryText}\n\n${output}`);
-					}
+				openedDoc?.edit((editText)=>{
+					if (!selectionEnd){return;}
+						editText.insert(selectionEnd, `\n'''\n${res['data']['output']}\n'''\n`);
 				});
-				vscode.window.showInformationMessage('Succussfull');
-			} 
-			catch (error:any) {
+			} catch (error) {
 				console.log(error);
-				if (error?.response?.status>=500){
-					vscode.window.showErrorMessage('looks like Server failed...');
-				}
-				else if (error?.response?.status>=400){
-					vscode.window.showErrorMessage('looks like Authorrization failed...');
-				}
-				else{
 				vscode.window.showErrorMessage('looks like something went wrong...');
-				}
 			}
+
 		});
 
 	});
@@ -690,6 +678,223 @@ export function activate(context: vscode.ExtensionContext) {
 		
 
 	});
+	let disposablNLtoSQL = vscode.commands.registerCommand("autoflow.nl2sql",async (...args: any[]) => {
+		  console.log(`Nl2SQL ran with`, args);
+		  const openedDoc = vscode.window.activeTextEditor;
+		  const selectionStart = openedDoc?.selection.anchor;
+	
+		  /*const prompt = openedDoc?.document.getText(openedDoc.selection);
+			if (!prompt){
+				vscode.window.showErrorMessage('No Code Selected. Please Highlight Some Code..');
+				return;
+			}*/
+		  const fileExtension = openedDoc?.document.fileName.split(".").pop();
+		  console.log("opened file is", fileExtension);
+	
+		  const queryGenerator = new QueryGenerator();
+		  await queryGenerator.getQueryNL();
+	
+		  if (
+			queryGenerator.queryInfo.task === "" ||
+			queryGenerator.queryInfo.tableName === "" ||
+			queryGenerator.queryInfo.columnName === ""
+		  ) {
+			return;
+		  }
+		  const range: vscode.Range = args[0];
+		  vscode.window.withProgress(
+			{
+			  location: vscode.ProgressLocation.Notification,
+			  cancellable: true,
+			  title: "AutoFlow",
+			},
+			async (progress, cancelToken) => {
+			  cancelToken.onCancellationRequested(() => {
+				vscode.window.showInformationMessage("Cancelled!");
+			  });
+	
+			  progress.report({
+				increment: 0,
+				message: "Processing your query...",
+			  });
+			  setTimeout(() => {
+				progress.report({ increment: 30, message: "Generating response" });
+			  }, 1000);
+			  setTimeout(() => {
+				progress.report({ increment: 20, message: "Half way there..." });
+			  }, 3000);
+			  setTimeout(() => {
+				progress.report({ increment: 30, message: "Finishing query" });
+			  }, 5000);
+	
+			  setTimeout(() => {
+				progress.report({ increment: 15, message: "Prinitng Response" });
+			  }, 9000);
+	
+			  try {
+				const res = await axios.post(`http://127.0.0.1:8080/nl2sql`, {
+				  tableName: queryGenerator.queryInfo.tableName,
+				  columnName: queryGenerator.queryInfo.columnName,
+				  task: queryGenerator.queryInfo.task,
+				});
+				console.log(res, res["data"]);
+				if (res["data"]["status"] !== "ok") {
+				  vscode.window.showErrorMessage(
+					"looks like something went wrong..."
+				  );
+				  return;
+				}
+				openedDoc?.edit((editText) => {
+				  if (fileExtension === "py") {
+					editText.insert(
+					  range?.end ?? selectionStart,
+					  `\n'''\n${res["data"]["output"]}\n'''\n`
+					);
+				  } else {
+					editText.insert(
+					  range?.end ?? selectionStart,
+					  `\n/\n${res["data"]["output"]}\n/\n`
+					);
+				  }
+				});
+			  } catch (error) {
+				console.log(error);
+				vscode.window.showErrorMessage(
+				  "looks like something went wrong..."
+				);
+			  }
+			}
+		  );
+		}
+	  );
+
+	let disposableApiReq = vscode.commands.registerCommand('autoflow.api_req',async (...args:any[]) => {
+		console.log(`API Req ran with`, args);
+		let openedDoc = vscode.window.activeTextEditor;
+		if (!openedDoc){
+			vscode.window.showErrorMessage('Please Open a Filer Where the Autoflow can show result');
+		}
+		const fileExtension = openedDoc?.document.fileName.split('.').pop();
+		console.log('opened file is',fileExtension);
+		const range:vscode.Range = args[0];
+
+		const api_name = await vscode.window.showInputBox({
+			value: '',
+			placeHolder: 'API Name you want to request. e.g. Google Translate',
+			validateInput: text => {
+				return text.trim() === '' ? 'Cant Be Empty' : null;
+			}
+		});
+		if (!api_name){
+			console.log('user enetered some of fields empty, so cant really do anyhting with it.');
+			return ;
+		}
+		const task = await vscode.window.showInputBox({
+			value: '',
+			placeHolder: 'Enter what you want to do with API. e.g. "Translate from German To English"',
+			validateInput: text => {
+				return text.trim() === '' ? 'Cant Be Empty' : null;
+			}
+		});
+		if (!api_name || !task){
+			console.log('user enetered some of fields empty, so cant really do anyhting with it.');
+			return ;
+		}
+		const params = await vscode.window.showInputBox({
+			value: '',
+			placeHolder: 'Enter Parameters for the API to use e.g. "Ich bin dein vater"',
+			validateInput: text => {
+				return text.trim() === '' ? 'Cant Be Empty' : null;
+			}
+		});
+		if (!api_name || !task || !params){
+			console.log('user enetered some of fields empty, so cant really do anyhting with it.');
+			return ;
+		}
+		const token = await vscode.window.showInputBox({
+			value: '',
+			placeHolder: 'Enter token value for your api (leave empty if not required) e.g. "z$&74bfdd83-bkdd-$hf8##h4"'
+		});
+
+		if (!api_name || !task || !params){
+			console.log('user enetered some of fields empty, so cant really do anyhting with it.');
+			return ;
+		}
+
+		vscode.window.withProgress({
+			location:vscode.ProgressLocation.Notification,
+			cancellable:true,
+			title:'AutoFlow'
+		}, async (progress, cancelToken)=>{
+			cancelToken.onCancellationRequested(()=>{
+				vscode.window.showInformationMessage('Cancelled!');
+			});
+
+
+			try {
+				
+			
+			progress.report({increment:0, message:'Processing your query...'});
+			setTimeout(() => {
+				progress.report({increment:30, message:'Generating response'});
+			}, 1000);
+			setTimeout(() => {
+				progress.report({increment:20, message:'Half way there...'});
+			}, 3000);
+			setTimeout(() => {
+				progress.report({increment:30, message:'Finishing query'});
+			}, 5000);
+			setTimeout(() => {
+				progress.report({increment:15, message:'Prinitng Response'});
+			}, 9000);
+			const resBody: {[id:string]:string} = {
+				api_name:api_name,
+				task:task,
+				params:params,
+			};
+			if (token && token!==''){
+				resBody['token'] = token;
+			}
+				const res = await axios.post(`http://127.0.0.1:8080/api_req`, resBody);
+				console.log(res, res['data']);
+				if (res['data']['status']!=='ok'){
+					vscode.window.showErrorMessage('looks like something went wrong...');
+					return;
+				}
+				if (!openedDoc){
+					let openedDoc = vscode.window.activeTextEditor;
+					vscode.window.showErrorMessage('Please Open a Filer Where the Autoflow can show result');
+				}
+				const selectionEnd = vscode.window.activeTextEditor?.visibleRanges[0].start;
+				
+				openedDoc?.edit((editText)=>{
+					if (fileExtension === 'py'){
+						editText.insert(range?.end?? selectionEnd, `\n'''\nAPI Req Code:\n\n${res['data']['output']}\n'''\n`);
+					}
+					else{
+						editText.insert(range?.end?? selectionEnd, `\n/*\nAPI Req Code:\n\n${res['data']['output']}\n*/\n`);
+					}
+					
+				});
+			} catch (error) {
+				console.log(error);
+				vscode.window.showErrorMessage('looks like something went wrong...');
+				return;
+			}
+		});
+		
+
+	});
+
+	let disposableCommitMessage = vscode.commands.registerCommand('autoflow.recc_commit', async (...args:any[])=>{
+		console.log('testing');
+		vscode.window.activeTerminal?.sendText('git diff > .autoflow');
+		const f = await vscode.workspace.findFiles('.autoflow');
+		const t = await vscode.workspace.fs.readFile(f[0]);
+		console.log(t.toString());
+	});
+	
+
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(disposableFlow);
 	context.subscriptions.push(disposableCode2nl);
@@ -700,6 +905,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposableCode2DocString);
 	context.subscriptions.push(disposableCode2UT);
 	context.subscriptions.push(disposableCodeCompletion);
+	context.subscriptions.push(disposablNLtoSQL);
+	context.subscriptions.push(disposableApiReq);
+	context.subscriptions.push(disposableCommitMessage);
+	
 }
 
 // this method is called when your extension is deactivated

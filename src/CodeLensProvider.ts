@@ -29,7 +29,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     this._onDidChangeCodeLenses.event;
 
   constructor() {
-    this.regex = /(.+)/g;
+    this.regex = /(autoflow:+)/g;
 
     vscode.workspace.onDidChangeConfiguration((_) => {
       this._onDidChangeCodeLenses.fire();
@@ -77,6 +77,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 }
               }
             });
+            
           } catch (error) {
             console.log(error);
           }
@@ -186,6 +187,23 @@ function generateLens(command: string, range: vscode.Range) {
         title: "Complete Code",
         command: "autoflow.complete_code",
         tooltip: "Complete The Code",
+        arguments: [range],
+      });
+    }
+    case 'nl2sql':{
+        return new vscode.CodeLens(range, {
+            title:'Generate Query',
+            command:'autoflow.nl2sql',
+            tooltip:'Generate SQL Query',
+            arguments:[range]
+        });
+    }
+    break;
+    case "get_api_request_code": {
+      return new vscode.CodeLens(range, {
+        title: "Make API Request Code ",
+        command: "autoflow.api_req",
+        tooltip: "Create API Request Code",
         arguments: [range],
       });
     }

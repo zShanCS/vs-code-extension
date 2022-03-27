@@ -98,7 +98,19 @@
       },
       {
         "command": "autoflow.complete_code",
-        "title": "Autoflow: Code COmpletion"
+        "title": "Autoflow: Code Completion"
+      },
+      {
+        "command": "autoflow.nl2sql",
+      "title": "Autoflow: Generate SQL Query"
+      },
+      {
+        "command": "autoflow.api_req",
+        "title": "Autoflow: API Request"
+      },
+      {
+        "command": "autoflow.recc_commit",
+        "title": "Autoflow: Reccommind Commit"
       },
       {
         "command": "nodeDependencies.refreshEntry",
