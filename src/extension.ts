@@ -887,8 +887,8 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	let disposableCommitMessage = vscode.commands.registerCommand('autoflow.recc_commit', async (...args:any[])=>{
-		console.log('testing');
 		vscode.window.activeTerminal?.sendText('git diff > .autoflow');
+		vscode.window.showInformationMessage('Make sure to add ".autoflow" to .gitignore file');
 		const f = await vscode.workspace.findFiles('.autoflow');
 		const t = await vscode.workspace.fs.readFile(f[0]);
 		console.log(t.toString());
