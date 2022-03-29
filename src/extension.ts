@@ -6,7 +6,7 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "D:/code/extensions/vs code/devrev/autoflow/.env" });
 const axios = require("axios").default;
 import { Configuration, OpenAIApi } from "openai";
-
+var ncp = require("copy-paste");
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -15,7 +15,6 @@ import { NodeDependenciesProvider } from "./TreeView/nodeDependencies";
 import * as vscode from "vscode";
 import { CodelensProvider } from "./CodeLensProvider";
 import { QueryGenerator } from "./QueryGenerator";
-import { addListener } from "process";
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -49,9 +48,21 @@ export function activate(context: vscode.ExtensionContext) {
   // The commandId parameter must match the command field in package.json
   let disposableSearch = vscode.commands.registerCommand('autoflow.search',async () => {
 	  
-	const s = await vscode.commands.executeCommand('search.action.openNewEditor', "hello world");
-	vscode.commands.executeCommand('editor.action.clipboardPasteAction');
+    const allfiles = await  vscode.workspace.findFiles('*', '**​/node_modules/**');
+    allfiles.forEach(element => {
+      console.log(element.fsPath);
+    });
+    
+
+	ncp.copy('helo world wtf is going on??', async ()=>{
+	  const s = await vscode.commands.executeCommand('workbench.action.findInFiles');
+    vscode.commands.executeCommand('editor.action.clipboardPasteAction');
   });
+
+	
+
+  });
+
   let disposable = vscode.commands.registerCommand("autoflow.all", async () => {
     // The code you place here will be executed every time your command is executed
     // Display a message box to the user
