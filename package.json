@@ -61,8 +61,12 @@
         "title": "Add"
       },
       {
-        "command": "autoflow.sayhi",
-        "title": "Say Hi"
+        "command": "autoflow.search",
+        "title": "Autoflow:Search"
+      },
+      {
+        "command": "autoflow.all",
+        "title": "Autoflow:All Commands"
       },
       {
         "command": "autoflow.flow",

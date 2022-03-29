@@ -58,16 +58,18 @@ export class CodelensProvider implements vscode.CodeLensProvider {
         const userQuery = line.text.toLowerCase();
         let someCodeLensGenerated = false;
         if (range && userQuery.startsWith("autoflow:")) {
+          const cleanedQuery = userQuery.replace('autoflow:', '');
           try {
             const res = await axios.post(`http://127.0.0.1:8080/intent`, {
-              query: userQuery,
+              query: cleanedQuery,
             });
             console.log(res);
             if (res["data"]["status"] !== "ok") {
               return null;
             }
+            //generate lens from server intents;
             const intentList: Array<string> = res["data"]["output"];
-            console.log(userQuery, intentList);
+            console.log(cleanedQuery, intentList);
             intentList.forEach((command) => {
               if (commandList.includes(command)) {
                 let lens = generateLens(command, range);
@@ -78,6 +80,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
               }
             });
             
+
           } catch (error) {
             console.log(error);
           }
@@ -86,15 +89,24 @@ export class CodelensProvider implements vscode.CodeLensProvider {
               new vscode.CodeLens(range, {
                 title: "AutoFlow Magic",
                 command: "autoflow.flow",
-                tooltip: "Autoflow Run Auto Magic Command",
+                tooltip: "Let Autoflow take your prompt and show you best result.",
                 arguments: [
-                  vscode.window.activeTextEditor?.document.getText(
-                    vscode.window.activeTextEditor.selection
-                  ),
+                  range,
+                  cleanedQuery
                 ],
               })
             );
           }
+
+            //show more button that shows all commands.
+          this.codeLenses.push(
+            new vscode.CodeLens(range, {
+              title: "More",
+              command: "autoflow.all",
+              tooltip: "Show All Possible Commands"
+            })
+          );
+
         }
       }
 
