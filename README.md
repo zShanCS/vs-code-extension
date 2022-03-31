@@ -175,7 +175,7 @@ Another exciting feature that Autoflow provides is that it can help you write a 
 ## CodeBERT
 
 ### Code Semantic Search
-Want to find a function and unable to recall its name? Code Semantic Search does that for you. Give it a string explaining what you want to search and it searches for the function and return it in Output. This uses **CodeBert** model.
+Want to find a function and unable to recall its name? Code Semantic Search does that for you. Give it a string explaining what you want to search and it searches for the function in the code base and return it in output. 
 
 **Usage**
 - *Command:* Autoflow Search
