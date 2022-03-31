@@ -1,70 +1,106 @@
-# autoflow README
+﻿# Tutorial
 
-This is the README for your extension "autoflow". After writing up a brief description, we recommend including the following sections.
+## Intro
+Autoflow is a VS Code Extension that improves developer workflow. It uses **OpenAI Codex**, **CodeT5**, **CodeBert**, **MiniLM-L6-v2** and **CommitBert**  for Code Generation and dozens of other features that makes life of a developer smooth and easy. 
 
 ## Features
+Autoflow provides plenty of features which are listed below
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+1.	**User Intent Analysis**
+2. **Code Generation**
+3. **Code Explanation**
+4.  **Documentation Generation**
+5. **Generating SQL Queries from Natural Language Commands**
+6. **Explaining SQL Queries**
+7. **Automatic API Calls**
+8. **Error Explanation** 
+9. **Bug Fixing**
+10. **Create Function One Liners**
+11. **Unit Tests Generation**
+12. **Code Autocompletion**
+13. **Refactoring Code**
+14. **Detecting Vulnerabilities**
+15. **Github Commit Message Generation**
+16. **Code Semantic Search**
 
-For example if there is an image subfolder under your extension project workspace:
 
-\!\[feature X\]\(images/feature-x.png\)
+## Bridging the gap between User and Codex
+User does not always know the best practices to use Codex. Codex can not understand the context of the query which creates a gap between user's need and code generation. 
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+We have bridged this gap by creating custom templates. Users explain their need through easy commands and form inputs. We analyse these inputs and generate custom templates with certain keywords that are part of Codex best practices to generate accurate results.
 
-## Requirements
+    '''
+    <comment start> Convert this function in <language> to a one line function<comment end>
+    
+    <function header>
+    
+    <code>
+    
+    <comment start><language> one line version<comment end>:
+    
+    <function header>
+    
+    <return statement>'''
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## Intent Analysis
+First and foremost problem is to understand the requirement of the developer. We have used Sentence Transformer (SBERT) model **MiniLM-L6-v2** to understand the intent of the user. 
+The user adds a comment prefixed with `#:` for python files and `//:` for other files then they are suggested the command for their intent in CodeLens. We also provide a more option which opens the command palette for the user.
 
-## Extension Settings
+## Codex Features
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
 
-For example:
+### Code Generation
+Users provide description of the code to generate and that description is fed into Codex with optimal parameters that follow best practices. An example is given below
 
-This extension contributes the following settings:
+### Code Explanation
+User can select a code and asks for code explanation. It returns a paragraph that explains the code. An example is given below
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+### Document Generation
+This feature provide more formal documentation of functions and classes. This includes a description of the input parameters, return values, and a step-by-step explanation of how the code block works.
 
-## Known Issues
+### Generating SQL Queries from Natural Language
+User provides a list of tables, their respective column names, and short description of what task to perform. We return the SQL Query used to perform that task.
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+### Explaining SQL Queries
+User provides an SQL query and we generate a human readable explanation of what that query does and how it works.
 
-## Release Notes
+### Automatic API Calls
+If you don't want to read up on the documentation of how to write the request for a common API, just provide us the API name, the input prompt, and the required task that needs to be done. Optionally, users can provide an API Key. 
 
-Users appreciate release notes as you update your extension.
+We generate the code required to generate that request and parse its response.
 
-### 1.0.0
+### Error Explanation
+Have a piece of code and don't know what's wrong with it? Send us the piece of code and get a human readable explanation of what could be wrong with it.
 
-Initial release of ...
+### Bug Fixing
+Is your code not working properly? Send the code alongside an explanation of what it does. We will generate a fixed version of that code.
 
-### 1.0.1
+### Create Function One Liners
+Want to convert a function into a one-liner version so that it can be used as a lambda function? Send the function and we'll generate a line version of that function if it exists.
 
-Fixed issue #.
+### Unit Tests Generation
+Unit testing is a tedious task. Provide a function and get a set of unit tests that can test your code for correctness.
 
-### 1.1.0
+### Code Autocompletion
+Not familiar with the syntax of the language and tired of downloading multiple extensions? Autoflow completes the code for you! 
 
-Added features X, Y, and Z.
+## CodeT5 Features
 
------------------------------------------------------------------------------------------------------------
-## Following extension guidelines
+### Code Refactoring
+Code Refactoring is an important part of Software Development Life Cycle, but most of the developers find it boring and tedious. User can provide a piece of code and Autoflow will provide the refactored code for you.
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+### Detecting Vulnerabilities
+This feature uses **CodeT5** model and it detects the vulnerabilities in code. If there exist a vulnerability it returns a true otherwise false. This feature works best for C++. This is something which helps the developer to identify memory leaks or detect if the code can be improved
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+## CommitBERT
 
-## Working with Markdown
+### Github Commit Message Generation
+Another exciting feature that Autoflow provides is that it can help you write a GitHub commit message. It compares the difference between the last commit and current changes in the file and predicts a commit message. This uses **CommitBert** model.
 
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
+## CodeBERT
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
+### Code Semantic Search
+Want to find a function and unable to recall its name? Code Semantic Search does that for you. Give it a string explaining what you want to search and it searches for the function and return it in Output. This uses **CodeBert** model.
 
-### For more information
+ 
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
