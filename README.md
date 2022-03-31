@@ -6,10 +6,10 @@ Autoflow is a VS Code Extension that improves developer workflow. It uses **Open
 ## Features
 Autoflow provides plenty of features which are listed below
 
-1.	**User Intent Analysis**
+1. **User Intent Analysis**
 2. **Code Generation**
 3. **Code Explanation**
-4.  **Documentation Generation**
+4. **Documentation Generation**
 5. **Generating SQL Queries from Natural Language Commands**
 6. **Explaining SQL Queries**
 7. **Automatic API Calls**
@@ -61,7 +61,6 @@ Users provide description of the code to generate and that description is fed in
 User can select a code and asks for code explanation. It returns a paragraph that explains the code. An example is given below
 
 ![code explanation](media/code-explanation.gif)
-
 
 
 ### Document Generation
@@ -167,7 +166,9 @@ This feature uses **CodeT5** model and it detects the vulnerabilities in code. I
 Another exciting feature that Autoflow provides is that it can help you write a GitHub commit message. It compares the difference between the last commit and current changes in the file and predicts a commit message. This uses **CommitBert** model.
 
 **Usage**
-- *Command:* Autoflow Recommend Commit
+- *Command:* 
+    - `git diff > .autoflow`
+    - Autoflow Recommend Commit
 - *Input:*
     - Code
 
