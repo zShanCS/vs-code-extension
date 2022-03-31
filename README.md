@@ -84,7 +84,7 @@ Unit testing is a tedious task. Provide a function and get a set of unit tests t
 ### Code Autocompletion
 Not familiar with the syntax of the language and tired of downloading multiple extensions? Autoflow completes the code for you! 
 
-## CodeT5 Features
+## CodeT5
 
 ### Code Refactoring
 Code Refactoring is an important part of Software Development Life Cycle, but most of the developers find it boring and tedious. User can provide a piece of code and Autoflow will provide the refactored code for you.
