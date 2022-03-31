@@ -50,7 +50,12 @@ The user adds a comment prefixed with `#:` for python files and `//:` for other 
 
 
 ### Code Generation
-Users provide description of the code to generate and that description is fed into Codex with optimal parameters that follow best practices. An example is given below
+Users provide description of the code to generate and that description is fed into Codex with optimal parameters that follow best practices.
+
+**Usage**
+- *Command:* Autoflow Magic
+- *Input:*
+    - Prefix with `#:` and write a short description of the task for which the user wants to generate code
 
 ### Code Explanation
 User can select a code and asks for code explanation. It returns a paragraph that explains the code. An example is given below
