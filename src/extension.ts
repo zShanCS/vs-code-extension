@@ -1463,12 +1463,11 @@ export function activate(context: vscode.ExtensionContext) {
               );
               return;
             }
-            vscode.window.createOutputChannel('search').appendLine(res['data']['output']);
 
-            ncp.copy(res['data']['output'], async ()=>{
-              const s = await vscode.commands.executeCommand('workbench.action.findInFiles');
-              vscode.commands.executeCommand('editor.action.clipboardPasteAction');
-            });
+            const com_chan = vscode.window.createOutputChannel('code-search');
+            com_chan.append(res['data']['output']);
+            com_chan.show();
+            
 
           } catch (error) {
             console.log(error);
