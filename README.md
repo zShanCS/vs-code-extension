@@ -1,7 +1,7 @@
 ﻿# Tutorial
 
 ## Intro
-Autoflow is a VS Code Extension that improves developer workflow. It uses **OpenAI Codex**, **CodeT5**, **CodeBert**, **MiniLM-L6-v2** and **CommitBert**  for Code Generation and dozens of other features that makes life of a developer smooth and easy. 
+Autoflow is a VS Code Extension that improves developer workflow. It uses **OpenAI Codex**, **CodeT5**, **CodeBERT**, **MiniLM-L6-v2** and **CommitBERT**  for Code Generation and dozens of other features that makes life of a developer smooth and easy. 
 
 ## Features
 Autoflow provides plenty of features which are listed below
