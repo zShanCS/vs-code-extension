@@ -29,7 +29,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     this._onDidChangeCodeLenses.event;
 
   constructor() {
-    this.regex = /(autoflow:+)/g;
+    this.regex = /(.+)/g;
 
     vscode.workspace.onDidChangeConfiguration((_) => {
       this._onDidChangeCodeLenses.fire();
@@ -57,8 +57,8 @@ export class CodelensProvider implements vscode.CodeLensProvider {
         );
         const userQuery = line.text.toLowerCase();
         let someCodeLensGenerated = false;
-        if (range && userQuery.startsWith("autoflow:")) {
-          const cleanedQuery = userQuery.replace('autoflow:', '');
+        if (range && (userQuery.startsWith("#:") || userQuery.startsWith("//:")) ) {
+          const cleanedQuery = userQuery.replace(':', '');
           try {
             const res = await axios.post(`http://127.0.0.1:8080/intent`, {
               query: cleanedQuery,

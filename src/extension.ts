@@ -46,22 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
-  let disposableSearch = vscode.commands.registerCommand('autoflow.search',async () => {
-	  
-    const allfiles = await  vscode.workspace.findFiles('*', '**​/node_modules/**');
-    allfiles.forEach(element => {
-      console.log(element.fsPath);
-    });
-    
-
-	ncp.copy('helo world wtf is going on??', async ()=>{
-	  const s = await vscode.commands.executeCommand('workbench.action.findInFiles');
-    vscode.commands.executeCommand('editor.action.clipboardPasteAction');
-  });
-
-	
-
-  });
+  
 
   let disposable = vscode.commands.registerCommand("autoflow.all", async () => {
     // The code you place here will be executed every time your command is executed
@@ -78,6 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
       "Generate SQL Query",
       "API Request",
       "Reccommend Commit Message",
+      "Detect Defect",
       "Autoflow: Magic",
     ];
     const userSelect = await vscode.window.showQuickPick(allOptions, {
@@ -119,6 +105,9 @@ export function activate(context: vscode.ExtensionContext) {
           break;
         case "Reccommend Commit Message":
           vscode.commands.executeCommand("autoflow.recc_commit");
+          break;
+        case "Detect Defect":
+          vscode.commands.executeCommand("autoflow.detect_defect");
           break;
         case "Autoflow: Magic":
           vscode.commands.executeCommand("autoflow.flow");
@@ -712,6 +701,178 @@ export function activate(context: vscode.ExtensionContext) {
       );
     }
   );
+  let disposableDetectDefect = vscode.commands.registerCommand(
+    "autoflow.detect_defect",
+    async (...args: any[]) => {
+      console.log(`Detect defect ran with`, args);
+      const openedDoc = vscode.window.activeTextEditor;
+      //when the selection starts. this helps to see where to put the result
+      const selectionStart = openedDoc?.selection.anchor;
+      const prompt = openedDoc?.document.getText(openedDoc.selection);
+
+      if (!prompt) {
+        vscode.window.showErrorMessage(
+          "No Code Selected. Please Highlight Some Code.."
+        );
+        return;
+      }
+      const fileExtension = openedDoc?.document.fileName.split(".").pop();
+      console.log("opened file is", fileExtension);
+      const range: vscode.Range = args[0];
+
+      vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          cancellable: true,
+          title: "AutoFlow",
+        },
+        async (progress, cancelToken) => {
+          cancelToken.onCancellationRequested(() => {
+            vscode.window.showInformationMessage("Cancelled!");
+          });
+
+          progress.report({
+            increment: 0,
+            message: "Processing your query...",
+          });
+          setTimeout(() => {
+            progress.report({ increment: 30, message: "Generating response" });
+          }, 1000);
+          setTimeout(() => {
+            progress.report({ increment: 20, message: "Half way there..." });
+          }, 3000);
+          setTimeout(() => {
+            progress.report({ increment: 30, message: "Finishing query" });
+          }, 5000);
+          setTimeout(() => {
+            progress.report({ increment: 15, message: "Prinitng Response" });
+          }, 9000);
+
+          try {
+            const res = await axios.post(
+              `http://127.0.0.1:8080/detect-defect`,
+              {
+                prompt: prompt,
+              }
+            );
+            console.log(res, res["data"]);
+            if (res["data"]["status"] !== "ok") {
+              vscode.window.showErrorMessage(
+                "looks like something went wrong..."
+              );
+              return;
+            }
+            openedDoc?.edit((editText) => {
+              if (fileExtension === "py") {
+                editText.insert(
+                  range?.end ?? selectionStart,
+                  `\n'''Defect Found: \n${res["data"]["output"]}\n'''\n`
+                );
+              } else {
+                editText.insert(
+                  range?.end ?? selectionStart,
+                  `\n/* Defect Found: \n\n${res["data"]["output"]}\n*/\n`
+                );
+              }
+            });
+          } catch (error) {
+            console.log(error);
+            vscode.window.showErrorMessage(
+              "looks like something went wrong..."
+            );
+            return;
+          }
+        }
+      );
+    }
+  );
+
+  
+  let disposableRefine = vscode.commands.registerCommand(
+    "autoflow.refine",
+    async (...args: any[]) => {
+      console.log(`Refine ran with`, args);
+      const openedDoc = vscode.window.activeTextEditor;
+      //when the selection starts. this helps to see where to put the result
+      const selectionStart = openedDoc?.selection.anchor;
+      const prompt = openedDoc?.document.getText(openedDoc.selection);
+
+      if (!prompt) {
+        vscode.window.showErrorMessage(
+          "No Code Selected. Please Highlight Some Code.."
+        );
+        return;
+      }
+      const fileExtension = openedDoc?.document.fileName.split(".").pop();
+      console.log("opened file is", fileExtension);
+      const range: vscode.Range = args[0];
+
+      vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          cancellable: true,
+          title: "AutoFlow",
+        },
+        async (progress, cancelToken) => {
+          cancelToken.onCancellationRequested(() => {
+            vscode.window.showInformationMessage("Cancelled!");
+          });
+
+          progress.report({
+            increment: 0,
+            message: "Processing your query...",
+          });
+          setTimeout(() => {
+            progress.report({ increment: 30, message: "Generating response" });
+          }, 1000);
+          setTimeout(() => {
+            progress.report({ increment: 20, message: "Half way there..." });
+          }, 3000);
+          setTimeout(() => {
+            progress.report({ increment: 30, message: "Finishing query" });
+          }, 5000);
+          setTimeout(() => {
+            progress.report({ increment: 15, message: "Prinitng Response" });
+          }, 9000);
+
+          try {
+            const res = await axios.post(
+              `http://127.0.0.1:8080/refine`,
+              {
+                prompt: prompt,
+              }
+            );
+            console.log(res, res["data"]);
+            if (res["data"]["status"] !== "ok") {
+              vscode.window.showErrorMessage(
+                "looks like something went wrong..."
+              );
+              return;
+            }
+            openedDoc?.edit((editText) => {
+              if (fileExtension === "py") {
+                editText.insert(
+                  range?.end ?? selectionStart,
+                  `\n'''Refined Result: \n${res["data"]["output"]}\n'''\n`
+                );
+              } else {
+                editText.insert(
+                  range?.end ?? selectionStart,
+                  `\n/* Refined Result: \n\n${res["data"]["output"]}\n*/\n`
+                );
+              }
+            });
+          } catch (error) {
+            console.log(error);
+            vscode.window.showErrorMessage(
+              "looks like something went wrong..."
+            );
+            return;
+          }
+        }
+      );
+    }
+  );
 
   let disposableCode2UT = vscode.commands.registerCommand(
     "autoflow.unit_test",
@@ -911,6 +1072,7 @@ export function activate(context: vscode.ExtensionContext) {
       );
     }
   );
+
   let disposablNLtoSQL = vscode.commands.registerCommand(
     "autoflow.nl2sql",
     async (...args: any[]) => {
@@ -1164,9 +1326,164 @@ export function activate(context: vscode.ExtensionContext) {
       );
       const f = await vscode.workspace.findFiles(".autoflow");
       const t = await vscode.workspace.fs.readFile(f[0]);
-      console.log(t.toString());
+      const diff_text = t.toString();
+      console.log(diff_text);
+
+
+
+      vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          cancellable: true,
+          title: "AutoFlow",
+        },
+        async (progress, cancelToken) => {
+          cancelToken.onCancellationRequested(() => {
+            vscode.window.showInformationMessage("Cancelled!");
+          });
+
+          progress.report({
+            increment: 0,
+            message: "Processing your query...",
+          });
+          setTimeout(() => {
+            progress.report({ increment: 30, message: "Generating response" });
+          }, 1000);
+          setTimeout(() => {
+            progress.report({ increment: 20, message: "Half way there..." });
+          }, 3000);
+          setTimeout(() => {
+            progress.report({ increment: 30, message: "Finishing query" });
+          }, 5000);
+
+          setTimeout(() => {
+            progress.report({ increment: 15, message: "Prinitng Response" });
+          }, 9000);
+
+          try {
+            const res = await axios.post(`http://127.0.0.1:8080/commit-message`, {
+              prompt: diff_text
+            });
+            console.log(res, res["data"]);
+            if (res["data"]["status"] !== "ok") {
+              vscode.window.showErrorMessage(
+                "looks like something went wrong..."
+              );
+              return;
+            }
+            const com_chan = vscode.window.createOutputChannel('commit-message');
+            com_chan.append(res['data']['output']);
+            com_chan.show();
+            vscode.window.showInformationMessage(`Commit Message: ${res['data']['output']}`);
+          } catch (error) {
+            console.log(error);
+            vscode.window.showErrorMessage(
+              "looks like something went wrong..."
+            );
+          }
+        }
+      );
+
+
+
     }
   );
+
+  let disposableSearch = vscode.commands.registerCommand(
+    "autoflow.search",
+    async () => {
+      const userQuery = await vscode.window.showInputBox({
+        title:'What Do You Want to Search?'
+      });
+      if (!userQuery){
+        return;
+      }
+     
+      
+      vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          cancellable: true,
+          title: "AutoFlow",
+        },
+        async (progress, cancelToken) => {
+          cancelToken.onCancellationRequested(() => {
+            vscode.window.showInformationMessage("Cancelled!");
+          });
+
+          progress.report({
+            increment: 0,
+            message: "Processing your query...",
+          });
+          setTimeout(() => {
+            progress.report({ increment: 30, message: "Generating response" });
+          }, 1000);
+          setTimeout(() => {
+            progress.report({ increment: 20, message: "Half way there..." });
+          }, 3000);
+          setTimeout(() => {
+            progress.report({ increment: 30, message: "Finishing query" });
+          }, 5000);
+          setTimeout(() => {
+            progress.report({ increment: 15, message: "Prinitng Response" });
+          }, 9000);
+
+          try {
+
+            const allfiles = await vscode.workspace.findFiles(
+              "*",
+              "**​/node_modules/**"
+            );
+            const codeList:any[] = [];
+
+            async function readFiles(){
+
+              for(const element of allfiles){
+                let code:{[key:string]:string} = {};
+                console.log(element.fsPath);
+                code['fp'] = element.fsPath;
+                code['content'] = (await vscode.workspace.fs.readFile(element)).toString();
+                codeList.push(code);
+              }
+            }
+            
+
+
+            await readFiles();
+            console.log('code list being sent to server',codeList);
+            const res = await axios.post(`http://127.0.0.1:8080/search-code`, {
+              prompt: userQuery,
+              recreate: true,
+              code:codeList
+            });
+            console.log(res["data"]);
+            if (res["data"]["status"] !== "ok") {
+              vscode.window.showErrorMessage(
+                "looks like something went wrong..."
+              );
+              return;
+            }
+            vscode.window.createOutputChannel('search').appendLine(res['data']['output']);
+
+            ncp.copy(res['data']['output'], async ()=>{
+              const s = await vscode.commands.executeCommand('workbench.action.findInFiles');
+              vscode.commands.executeCommand('editor.action.clipboardPasteAction');
+            });
+
+          } catch (error) {
+            console.log(error);
+            vscode.window.showErrorMessage(
+              "looks like something went wrong..."
+            );
+            return;
+          }
+        }
+      );
+    }
+  );
+
+
+
 
   context.subscriptions.push(disposableSearch);
   context.subscriptions.push(disposable);
@@ -1182,6 +1499,8 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(disposablNLtoSQL);
   context.subscriptions.push(disposableApiReq);
   context.subscriptions.push(disposableCommitMessage);
+  context.subscriptions.push(disposableDetectDefect);
+  context.subscriptions.push(disposableRefine);
 }
 
 // this method is called when your extension is deactivated

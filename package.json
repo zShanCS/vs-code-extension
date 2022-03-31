@@ -117,6 +117,14 @@
         "title": "Autoflow: Reccommind Commit"
       },
       {
+        "command": "autoflow.detect_defect",
+        "title": "Autoflow: Detect Defect In Code"
+      },
+      {
+        "command": "autoflow.refine",
+        "title": "Autoflow: Fix/Refine Code"
+      },
+      {
         "command": "nodeDependencies.refreshEntry",
         "title": "Refresh",
         "icon": {
