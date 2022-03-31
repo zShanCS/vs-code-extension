@@ -64,7 +64,7 @@ User can select a code and asks for code explanation. It returns a paragraph tha
 
 
 
-### Document Generation
+### Documentation Generation
 This feature provide more formal documentation of functions and classes. This includes a description of the input parameters, return values, and a step-by-step explanation of how the code block works.
 
 ### Generating SQL Queries from Natural Language
