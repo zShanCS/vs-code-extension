@@ -55,6 +55,10 @@ Users provide description of the code to generate and that description is fed in
 ### Code Explanation
 User can select a code and asks for code explanation. It returns a paragraph that explains the code. An example is given below
 
+![code explanation](media/code-explanation.gif)
+
+
+
 ### Document Generation
 This feature provide more formal documentation of functions and classes. This includes a description of the input parameters, return values, and a step-by-step explanation of how the code block works.
 
@@ -83,6 +87,8 @@ Unit testing is a tedious task. Provide a function and get a set of unit tests t
 
 ### Code Autocompletion
 Not familiar with the syntax of the language and tired of downloading multiple extensions? Autoflow completes the code for you! 
+
+![code completion](media/code-completion.gif)
 
 ## CodeT5
 
