@@ -1,4 +1,12 @@
-﻿# Tutorial
+# How to Install
+
+Clone this repository using git clone command. 
+cd into vs-code-extension and run `npm i`
+Once installation is finished you can press `F5` and a new VS Code window with Autoflow running in it would be opened.
+
+You also need to start the server to be able to test this.
+Go to: https://github.com/zShanCS/openai-autoflow to do that.
+# Tutorial
 
 ## Intro
 Autoflow is a VS Code Extension that improves developer workflow. It uses **OpenAI Codex**, **CodeT5**, **CodeBERT**, **MiniLM-L6-v2** and **CommitBERT**  for Code Generation and dozens of other features that makes life of a developer smooth and easy. 
