@@ -1,6 +1,6 @@
 # Tutorial
 
-## How to Install
+## Installation
 
 Clone this repository using git clone command.
 cd into vs-code-extension and run `npm i`
@@ -66,7 +66,7 @@ The user adds a comment prefixed with `#:` for python files and `//:` for other 
 
 Users provide description of the code to generate and that description is fed into Codex with optimal parameters that follow best practices.
 
-**Usage**
+**Usage**$$
 
 - *Command:* Autoflow Magic
 - *Input:*
